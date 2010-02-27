@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.conf import settings
 from models import Entry, Category
 from views import tag_entry_detail_view, category_detail_view, preview, post_comment
 from feeds import LatestEntries
@@ -20,7 +21,8 @@ urlpatterns = patterns('',
 urlpatterns += patterns('django.views.generic',
                         url('^$', 
                             'list_detail.object_list', 
-                            dict(queryset=Entry.public.order_by('-published'), paginate_by=1), 
+                            dict(queryset=Entry.public.order_by('-published'), 
+                                 paginate_by=getattr(settings, 'SET_DETAILS_ENTRIES_PER_PAGE', 1)), 
                             name='blog-index'),
 
                         url('^blog$', 
@@ -29,7 +31,6 @@ urlpatterns += patterns('django.views.generic',
                                  paginate_by=10, 
                                  template_name='entry_list_all'), 
                             name='blog-index-all'),
-
                         url(r'^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/(?P<slug>[\w\-]+)/?$',
                             'date_based.object_detail', dict(queryset=Entry.public.all(), month_format='%m', date_field='published'), name='blog-entry'),
 )
